@@ -128,26 +128,7 @@ var AiccTestEnvironment = (function($){
       this.auWin = openWindow(url_name,'auWin',1024,768,'resizable');
       if(this.auWin != null)
       {
-        initSetTimeOut();
-      }
-    },
-
-    /**
-     * [getObj description]
-     * @param  {[type]} name [description]
-     * @return {[type]}      [description]
-     */
-    getObj: function(name)
-    {
-      if(document.getElementById)
-      {
-        this.obj = document.getElementById(name);
-        this.style = document.getElementById(name).style;
-      }
-      else if(document.all)
-      {
-        this.obj = document.all[name];
-        this.style = document.all[name].style;
+        this.initSetTimeOut();
       }
     },
 
@@ -199,6 +180,7 @@ var AiccTestEnvironment = (function($){
      */
     clearLogFile: function()
     {
+      var self = this;
       var xmlhttp =  new XMLHttpRequest();
       xmlhttp.open('GET', $('#aicc_url').val() + '?command=clearlog', true);
 
@@ -208,13 +190,13 @@ var AiccTestEnvironment = (function($){
         {
           if(xmlhttp.responseText == 'SUCCESS')
           {
-            this.success('Log File Cleared');
+            self.success('Log File Cleared');
             $('#log-text').html('');
             $('#log-text').scrollTop();
           }
           else
           {
-            this.warning('An error has occurred.');
+            self.warning('An error has occurred.');
           }
         }
       }
@@ -228,6 +210,7 @@ var AiccTestEnvironment = (function($){
      */
     clearDataFile: function()
     {
+      var self = this;
       var xmlhttp =  new XMLHttpRequest();
       xmlhttp.open('GET', $('#aicc_url').val() + '?command=cleardata', true);
 
@@ -237,11 +220,11 @@ var AiccTestEnvironment = (function($){
         {
           if(xmlhttp.responseText == 'SUCCESS')
           {
-            this.success('Data File Cleared');
+            self.success('Data File Cleared');
           }
           else
           {
-            this.warning('An error has occurred.');
+            self.warning('An error has occurred.');
           }
         }
       }
@@ -255,6 +238,7 @@ var AiccTestEnvironment = (function($){
      */
     testScript: function()
     {
+      var self = this;
       var xmlhttp =  new XMLHttpRequest();
       xmlhttp.open('GET', $('#aicc_url').val() + '?command=test', true);
 
@@ -264,12 +248,11 @@ var AiccTestEnvironment = (function($){
         {
           if(xmlhttp.responseText == 'SUCCESS')
           {
-            this.success('Test log was successfully written to log file.  Refreshing log file...');
-            this.refreshLogFile();
+            self.refreshLogFile();
           }
           else
           {
-            this.warning('An error has occurred. The AICC test script is not accessible, or an error is causing it to malfunction.');
+            self.warning('An error has occurred. The AICC test script is not accessible, or an error is causing it to malfunction.');
           }
         }
       }
