@@ -1,0 +1,25 @@
+
+.alert
+{
+  position:fixed;
+  left:1em;
+  bottom:1em;
+  display:none;
+}
+
+.log-actions
+{
+	margin:0 0 1em 0;
+}
+
+#log-text
+{
+  height:300px;
+  padding:1em;
+  overflow:auto;
+}
+
+small
+{
+	font-color:#999;
+}
