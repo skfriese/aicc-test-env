@@ -60,6 +60,29 @@ var AiccTestEnvironment = (function($){
   };
 
   /**
+     * [openWindow description]
+     * @param  {[type]} url_name    [description]
+     * @param  {[type]} window_name [description]
+     * @param  {[type]} w           [description]
+     * @param  {[type]} h           [description]
+     * @param  {[type]} options     [description]
+     * @return {[type]}             [description]
+     */
+    var openWindow = function(url_name,window_name,w,h,options)
+    {
+      if (options === null) { options=""; }
+      var winopts = "toolbar=" + (options.indexOf("toolbar") == -1 ? "no," : "yes,") +
+      "location="  + (options.indexOf("location") == -1 ? "no," : "yes,") +
+      "menubar=" + (options.indexOf("menubar") == -1 ? "no," : "yes,") +
+      "scrollbars=" + (options.indexOf("scrollbars") == -1 ? "no," : "yes,") +
+      "status=" + (options.indexOf("status") == -1 ? "no," : "yes,") +
+      "resizable=" + (options.indexOf("resizable") == -1 ? "no," : "yes,") +
+      "copyhistory=" + (options.indexOf("copyhistory") == -1 ? "no," : "yes,") +
+      "width=" + w + ",height=" + h;
+      return window.open(url_name,window_name,winopts);
+    };
+
+  /**
    * The AiccTestEnvironment constructor
    */
   function AiccTestEnvironment()
@@ -81,29 +104,6 @@ var AiccTestEnvironment = (function($){
       this.showData();
 
       return this;
-    },
-
-    /**
-     * [openWindow description]
-     * @param  {[type]} url_name    [description]
-     * @param  {[type]} window_name [description]
-     * @param  {[type]} w           [description]
-     * @param  {[type]} h           [description]
-     * @param  {[type]} options     [description]
-     * @return {[type]}             [description]
-     */
-    openWindow: function(url_name,window_name,w,h,options)
-    {
-      if (options === null) { options=""; }
-      winopts = "toolbar=" + (options.indexOf("toolbar") == -1 ? "no," : "yes,") +
-      "location="  + (options.indexOf("location") == -1 ? "no," : "yes,") +
-      "menubar=" + (options.indexOf("menubar") == -1 ? "no," : "yes,") +
-      "scrollbars=" + (options.indexOf("scrollbars") == -1 ? "no," : "yes,") +
-      "status=" + (options.indexOf("status") == -1 ? "no," : "yes,") +
-      "resizable=" + (options.indexOf("resizable") == -1 ? "no," : "yes,") +
-      "copyhistory=" + (options.indexOf("copyhistory") == -1 ? "no," : "yes,") +
-      "width=" + w + ",height=" + h;
-      return window.open(url_name,window_name,winopts);
     },
 
     /**
