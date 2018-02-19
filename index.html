@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
   <title>Simple AICC Test Environment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="assets/css/styles.css">
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
   <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
@@ -10,7 +13,7 @@
 
   <div class="container">
 
-    <h1>Simple AICC Test Environment <small><a href="https://github.com/skfriese/aicc-test-env"><b class="fa fa-external-link"></b></a></small></h1>
+    <h1>Simple AICC Test Environment</h1>
 
     <div class="panel panel-default">
       <div class="panel-heading">
@@ -22,22 +25,29 @@
             <label for="au_url" class="col-sm-2 control-label">AU URL</label>
             <div class="col-sm-10">
               <input type="text" class="form-control" id="au_url" placeholder="http://...">
-              <small>Enter the full URL to the assignable unit (content) and click the <b>Launch Content</b> button below.</small>
+              <small>Enter the full URL to the AU and click the <b>Launch Content</b> button below.</small>
             </div>
           </div>
           <div id="extras" class="collapse">
             <div class="form-group">
               <label for="aicc_sid" class="col-sm-2 control-label">AICC_SID</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="aicc_sid" placeholder="AICC_SID parameter">
+                <input type="text" class="form-control" id="aicc_sid" placeholder="AICC_SID Parameter">
                 <small>Modify this value to specify the AICC_SID (session ID) parameter, which will be passed to the content when launched.</small>
               </div>
             </div>
             <div class="form-group">
               <label for="aicc_url" class="col-sm-2 control-label">AICC_URL</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="aicc_url" placeholder="AICC_URL parameter">
+                <input type="text" class="form-control" id="aicc_url" placeholder="AICC_URL Parameter">
                 <small>Modify this value to specify the AICC_URL (LMS URL) parameter, which will be passed to the content when launched. To allow this test environment to act as the LMS and capture communication, leave this value as-is.</small>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="au_params" class="col-sm-2 control-label">AU Params</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="au_params" placeholder="param1=value1&param2=value2...">
+                <small>Add parameters which are specific to the AU (in format &quot;param1=value1&amp;param2=value2...&quot;).</small>
               </div>
             </div>
           </div>

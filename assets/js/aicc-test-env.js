@@ -38,7 +38,7 @@ var AiccTestEnvironment = (function($){
     var text = "";
     var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    for( var i=0; i <= len; i++ )
+    for( var i=0; i < len; i++ )
     {
       text += chars.charAt(Math.floor(Math.random() * chars.length));
     }
@@ -60,27 +60,27 @@ var AiccTestEnvironment = (function($){
   };
 
   /**
-     * [openWindow description]
-     * @param  {[type]} url_name    [description]
-     * @param  {[type]} window_name [description]
-     * @param  {[type]} w           [description]
-     * @param  {[type]} h           [description]
-     * @param  {[type]} options     [description]
-     * @return {[type]}             [description]
-     */
-    var openWindow = function(url_name,window_name,w,h,options)
-    {
-      if (options === null) { options=""; }
-      var winopts = "toolbar=" + (options.indexOf("toolbar") == -1 ? "no," : "yes,") +
-      "location="  + (options.indexOf("location") == -1 ? "no," : "yes,") +
-      "menubar=" + (options.indexOf("menubar") == -1 ? "no," : "yes,") +
-      "scrollbars=" + (options.indexOf("scrollbars") == -1 ? "no," : "yes,") +
-      "status=" + (options.indexOf("status") == -1 ? "no," : "yes,") +
-      "resizable=" + (options.indexOf("resizable") == -1 ? "no," : "yes,") +
-      "copyhistory=" + (options.indexOf("copyhistory") == -1 ? "no," : "yes,") +
-      "width=" + w + ",height=" + h;
-      return window.open(url_name,window_name,winopts);
-    };
+   * [openWindow description]
+   * @param  {[type]} url_name    [description]
+   * @param  {[type]} window_name [description]
+   * @param  {[type]} w           [description]
+   * @param  {[type]} h           [description]
+   * @param  {[type]} options     [description]
+   * @return {[type]}             [description]
+   */
+  var openWindow = function(url_name,window_name,w,h,options)
+  {
+    if (options === null) { options=""; }
+    var winopts = "toolbar=" + (options.indexOf("toolbar") == -1 ? "no," : "yes,") +
+    "location="  + (options.indexOf("location") == -1 ? "no," : "yes,") +
+    "menubar=" + (options.indexOf("menubar") == -1 ? "no," : "yes,") +
+    "scrollbars=" + (options.indexOf("scrollbars") == -1 ? "no," : "yes,") +
+    "status=" + (options.indexOf("status") == -1 ? "no," : "yes,") +
+    "resizable=" + (options.indexOf("resizable") == -1 ? "no," : "yes,") +
+    "copyhistory=" + (options.indexOf("copyhistory") == -1 ? "no," : "yes,") +
+    "width=" + w + ",height=" + h;
+    return window.open(url_name,window_name,winopts);
+  };
 
   /**
    * The AiccTestEnvironment constructor
@@ -100,6 +100,7 @@ var AiccTestEnvironment = (function($){
      */
     initialize: function()
     {
+      this.getPersistedSession();
       this.populateForm();
       this.showData();
 
@@ -113,8 +114,41 @@ var AiccTestEnvironment = (function($){
     populateForm: function()
     {
       $('#au_url').val(DEFAULT_AU_URL);
-      $('#aicc_sid').val(AICC_SID_PREFIX+getRandomId(32));
+      $('#aicc_sid').val(this.session_id);
       $('#aicc_url').val(getThisFolder()+DEFAULT_AICC_SCRIPT_FILENAME);
+    },
+
+    /**
+     * [getPersistedSession description]
+     * @return {[type]} [description]
+     */
+    getPersistedSession: function()
+    {
+      var sess = localStorage.getItem("aicc_test_env_session_id");
+      if(!sess)
+      {
+        var sess = AICC_SID_PREFIX+getRandomId(8);
+      }
+      
+      this.session_id = sess;
+      return sess;
+    },
+
+    /**
+     * [persistSession description]
+     * @return {[type]} [description]
+     */
+    persistSession: function()
+    {
+      var aicc_sid = $('#aicc_sid').val();
+      if(aicc_sid == "")
+      {
+        this.getPersistedSession();
+        $('#aicc_sid').val(this.session_id);
+      }
+
+      this.session_id = aicc_sid;
+      localStorage.setItem("aicc_test_env_session_id", this.session_id);
     },
 
     /**
@@ -123,9 +157,26 @@ var AiccTestEnvironment = (function($){
      */
     launch: function()
     {
-      var initChar = ($('#au_url').val().indexOf("?") > -1) ?  "&" : "?";
-      var url_name = $('#au_url').val() + initChar + 'aicc_sid=' + $('#aicc_sid').val() + '&aicc_url=' + $('#aicc_url').val();
-      this.auWin = openWindow(url_name,'auWin',1024,768,'resizable');
+      var au_url = $('#au_url').val();
+      var au_params = $('#au_params').val();
+      var aicc_sid = $('#aicc_sid').val();
+      var aicc_url = $('#aicc_url').val();
+
+      if(au_url == "")
+      {
+        this.warning("Enter the AU URL before launching");
+        return;
+      }
+
+      this.persistSession();
+
+      var initChar = (au_url.indexOf("?") > -1) ?  "&" : "?";
+      var url = au_url + initChar + 'aicc_sid=' + encodeURIComponent(aicc_sid) + '&aicc_url=' + encodeURIComponent(aicc_url);
+      if(au_params != "")
+      {
+        url = url + "&" + au_params;
+      }
+      this.auWin = openWindow(url,'auWin',1024,768,'resizable,location');
       if(this.auWin != null)
       {
         this.initSetTimeOut();
@@ -138,19 +189,16 @@ var AiccTestEnvironment = (function($){
      */
     refreshLogFile: function()
     {
-      var xmlhttp =  new XMLHttpRequest();
-      xmlhttp.open('GET', $('#aicc_url').val() + '?command=getlog', true);
-      this.success('Refreshing logs...');
-      xmlhttp.onreadystatechange = function()
-      {
-        if(xmlhttp.readyState == 4)
-        {
-          $('#log-text').html(removeTags(xmlhttp.responseText));
-          $('#log-text').scrollTop();
-        }
-      }
-
-      xmlhttp.send(null);
+      var self = this;
+      $.get($('#aicc_url').val() + '?command=getlog&session_id='+this.session_id)
+       .done(function(data){
+        self.success('Refreshing logs...');
+        $('#log-text').html(removeTags(data));
+        $('#log-text').scrollTop();
+       })
+       .fail(function(){
+        self.warning('An error has occurred.');
+       });
     },
 
     /**
@@ -159,19 +207,16 @@ var AiccTestEnvironment = (function($){
      */
     showData: function()
     {
-      var xmlhttp =  new XMLHttpRequest();
-      xmlhttp.open('GET', $('#aicc_url').val() + '?command=getdata', true);
-      this.success('Requesting persisted data...');
-      xmlhttp.onreadystatechange = function()
-      {
-        if(xmlhttp.readyState == 4)
-        {
-          $('#data').html(removeTags(xmlhttp.responseText));
-          $('#data').scrollTop();
-        }
-      }
-
-      xmlhttp.send(null);
+      var self = this;
+      $.get($('#aicc_url').val() + '?command=getdata&session_id='+this.session_id)
+       .done(function(data){
+        self.success('Refreshing data...');
+        $('#data').html(removeTags(data));
+        $('#data').scrollTop();
+       })
+       .fail(function(){
+        self.warning('An error has occurred.');
+       });
     },
 
     /**
@@ -181,27 +226,15 @@ var AiccTestEnvironment = (function($){
     clearLogFile: function()
     {
       var self = this;
-      var xmlhttp =  new XMLHttpRequest();
-      xmlhttp.open('GET', $('#aicc_url').val() + '?command=clearlog', true);
-
-      xmlhttp.onreadystatechange = function()
-      {
-        if(xmlhttp.readyState == 4)
-        {
-          if(xmlhttp.responseText == 'SUCCESS')
-          {
-            self.success('Log File Cleared');
-            $('#log-text').html('');
-            $('#log-text').scrollTop();
-          }
-          else
-          {
-            self.warning('An error has occurred.');
-          }
-        }
-      }
-
-      xmlhttp.send(null);
+      $.get($('#aicc_url').val() + '?command=clearlog&session_id='+this.session_id)
+       .done(function(data){
+        self.success('Log File Cleared');
+        $('#log-text').html('');
+        $('#log-text').scrollTop();
+       })
+       .fail(function(){
+        self.warning('An error has occurred.');
+       });
     },
 
     /**
@@ -211,25 +244,13 @@ var AiccTestEnvironment = (function($){
     clearDataFile: function()
     {
       var self = this;
-      var xmlhttp =  new XMLHttpRequest();
-      xmlhttp.open('GET', $('#aicc_url').val() + '?command=cleardata', true);
-
-      xmlhttp.onreadystatechange = function()
-      {
-        if(xmlhttp.readyState == 4)
-        {
-          if(xmlhttp.responseText == 'SUCCESS')
-          {
-            self.success('Data File Cleared');
-          }
-          else
-          {
-            self.warning('An error has occurred.');
-          }
-        }
-      }
-
-      xmlhttp.send(null);
+      $.get($('#aicc_url').val() + '?command=cleardata&session_id='+this.session_id)
+       .done(function(data){
+        self.success('Data File Cleared');
+       })
+       .fail(function(){
+        self.warning('An error has occurred.');
+       });
     },
 
     /**
@@ -239,25 +260,13 @@ var AiccTestEnvironment = (function($){
     testScript: function()
     {
       var self = this;
-      var xmlhttp =  new XMLHttpRequest();
-      xmlhttp.open('GET', $('#aicc_url').val() + '?command=test', true);
-
-      xmlhttp.onreadystatechange = function()
-      {
-        if(xmlhttp.readyState == 4)
-        {
-          if(xmlhttp.responseText == 'SUCCESS')
-          {
-            self.refreshLogFile();
-          }
-          else
-          {
-            self.warning('An error has occurred. The AICC test script is not accessible, or an error is causing it to malfunction.');
-          }
-        }
-      }
-
-      xmlhttp.send(null);
+      $.get($('#aicc_url').val() + '?command=test&session_id='+this.session_id)
+       .done(function(data){
+        self.refreshLogFile();
+       })
+       .fail(function(){
+        self.warning('An error has occurred. The AICC test script is not accessible, or an error is causing it to malfunction.');
+       });
     },
 
     /**
@@ -337,6 +346,7 @@ var AiccTestEnvironment = (function($){
 
 })(jQuery);
 
+// Ready... set... go.
 $(document).ready(function(){
 
   window.aiccTest = new AiccTestEnvironment().initialize();
