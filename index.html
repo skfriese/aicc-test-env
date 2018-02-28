@@ -33,7 +33,7 @@
               <label for="aicc_sid" class="col-sm-2 control-label">AICC_SID</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" id="aicc_sid" placeholder="AICC_SID Parameter">
-                <small>Modify this value to specify the AICC_SID (session ID) parameter, which will be passed to the content when launched.</small>
+                <small>Modify this value to specify the AICC_SID (session ID) parameter, which will be passed to the content when launched. <b>Note:</b> This value will be persisted locally upon launching the AU or testing the communication. It is used to reference the logs and data persisted in the test environment.</small>
               </div>
             </div>
             <div class="form-group">
@@ -53,8 +53,8 @@
           </div>
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
+              <button type="button" class="btn btn-primary" data-click="launch"><b class="fa fa-external-link"></b> Launch AU</button>
               <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#extras"><b class="fa fa-pencil"></b> Edit AICC Params</button>
-              <button type="button" class="btn btn-primary" data-click="launch"><b class="fa fa-external-link"></b> Launch Content</button>
             </div>
           </div>
         </form>
@@ -67,9 +67,9 @@
       </div>
       <div class="panel-body">
         <div class="log-actions">
-          <a class="btn btn-success" role="button" href="javascript:void(0);" data-click="refreshLogFile"><b class="fa fa-refresh"></b> Refresh Logs</a>
-          <a class="btn btn-warning" role="button" href="javascript:void(0);" data-click="clearLogFile"><b class="fa fa-trash-o"></b> Clear All Logs</a>
-          <a class="btn btn-info" role="button" href="javascript:void(0);" data-click="testScript"><b class="fa fa-dashboard"></b> Test AICC Script</a>
+          <a class="btn btn-success" role="button" href="javascript:void(0);" data-click="getLogs"><b class="fa fa-refresh"></b> Refresh Session Logs</a>
+          <a class="btn btn-danger" role="button" href="javascript:void(0);" data-click="deleteLogs"><b class="fa fa-trash-o"></b> Delete Session Logs</a>
+          
         </div>
         <pre id="log-text"></pre>
       </div>
@@ -81,10 +81,22 @@
       </div>
       <div class="panel-body">
         <div class="log-actions">
-          <a class="btn btn-success" role="button" href="javascript:void(0);" data-click="showData"><b class="fa fa-binoculars"></b> Show Persisted Data</a>
-          <a class="btn btn-danger" role="button" href="javascript:void(0);" data-click="clearDataFile"><b class="fa fa-trash-o"></b> Clear All Data</a>
+          <a class="btn btn-success" role="button" href="javascript:void(0);" data-click="getData"><b class="fa fa-binoculars"></b> Show Session Data</a>
+          <a class="btn btn-danger" role="button" href="javascript:void(0);" data-click="deleteData"><b class="fa fa-trash-o"></b> Delete Session Data</a>
         </div>
         <pre id="data"></pre>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><b class="fa fa-wrench"></b> Utilities</h3>
+      </div>
+      <div class="panel-body">
+        <div class="log-actions">
+          <a class="btn btn-info" role="button" href="javascript:void(0);" data-click="testScript"><b class="fa fa-check"></b> Test Communication</a>
+          <a class="btn btn-warning" role="button" href="javascript:void(0);" data-click="clearSession"><b class="fa fa-eraser"></b> Clear Session</a>
+        </div>
       </div>
     </div>
 

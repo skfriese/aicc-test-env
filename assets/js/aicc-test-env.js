@@ -60,6 +60,18 @@ var AiccTestEnvironment = (function($){
   };
 
   /**
+   * [prepLogs description]
+   * @param  {[type]} text [description]
+   * @return {[type]}      [description]
+   */
+  var prepLogs = function(text)
+  {
+    var lineSep = "----------";
+    var logs = removeTags(text);
+    return logs.split(lineSep).join("<hr>");
+  };
+
+  /**
    * [openWindow description]
    * @param  {[type]} url_name    [description]
    * @param  {[type]} window_name [description]
@@ -102,7 +114,8 @@ var AiccTestEnvironment = (function($){
     {
       this.getPersistedSession();
       this.populateForm();
-      this.showData();
+      this.getLogs();
+      this.getData();
 
       return this;
     },
@@ -114,7 +127,7 @@ var AiccTestEnvironment = (function($){
     populateForm: function()
     {
       $('#au_url').val(DEFAULT_AU_URL);
-      $('#aicc_sid').val(this.session_id);
+      $('#aicc_sid').val(this.sessionId);
       $('#aicc_url').val(getThisFolder()+DEFAULT_AICC_SCRIPT_FILENAME);
     },
 
@@ -130,7 +143,7 @@ var AiccTestEnvironment = (function($){
         var sess = AICC_SID_PREFIX+getRandomId(8);
       }
       
-      this.session_id = sess;
+      this.sessionId = sess;
       return sess;
     },
 
@@ -144,11 +157,21 @@ var AiccTestEnvironment = (function($){
       if(aicc_sid == "")
       {
         this.getPersistedSession();
-        $('#aicc_sid').val(this.session_id);
+        $('#aicc_sid').val(this.sessionId);
       }
 
-      this.session_id = aicc_sid;
-      localStorage.setItem("aicc_test_env_session_id", this.session_id);
+      this.sessionId = aicc_sid;
+      localStorage.setItem("aicc_test_env_session_id", this.sessionId);
+    },
+
+    /**
+     * [removeSession description]
+     * @return {[type]} [description]
+     */
+    removeSession: function()
+    {
+      localStorage.removeItem("aicc_test_env_session_id");
+      this.sessionId = null;
     },
 
     /**
@@ -184,16 +207,16 @@ var AiccTestEnvironment = (function($){
     },
 
     /**
-     * [refreshLogFile description]
+     * [getLogs description]
      * @return {[type]} [description]
      */
-    refreshLogFile: function()
+    getLogs: function()
     {
       var self = this;
-      $.get($('#aicc_url').val() + '?command=getlog&session_id='+this.session_id)
+      $.get($('#aicc_url').val() + '?command=getlog&session_id='+this.sessionId)
        .done(function(data){
         self.success('Refreshing logs...');
-        $('#log-text').html(removeTags(data));
+        $('#log-text').html(prepLogs(data));
         $('#log-text').scrollTop();
        })
        .fail(function(){
@@ -202,13 +225,13 @@ var AiccTestEnvironment = (function($){
     },
 
     /**
-     * [showData description]
+     * [getData description]
      * @return {[type]} [description]
      */
-    showData: function()
+    getData: function()
     {
       var self = this;
-      $.get($('#aicc_url').val() + '?command=getdata&session_id='+this.session_id)
+      $.get($('#aicc_url').val() + '?command=getdata&session_id='+this.sessionId)
        .done(function(data){
         self.success('Refreshing data...');
         $('#data').html(removeTags(data));
@@ -220,37 +243,59 @@ var AiccTestEnvironment = (function($){
     },
 
     /**
-     * [clearLogFile description]
+     * [deleteLogs description]
      * @return {[type]} [description]
      */
-    clearLogFile: function()
+    deleteLogs: function()
     {
       var self = this;
-      $.get($('#aicc_url').val() + '?command=clearlog&session_id='+this.session_id)
-       .done(function(data){
-        self.success('Log File Cleared');
-        $('#log-text').html('');
-        $('#log-text').scrollTop();
-       })
-       .fail(function(){
-        self.warning('An error has occurred.');
-       });
+      $.get($('#aicc_url').val() + '?command=clearlog&session_id='+this.sessionId)
+        .done(function(data){
+          self.success('Logs deleted for session '+self.sessionId);
+          $('#log-text').html('');
+          $('#log-text').scrollTop();
+        })
+        .fail(function(){
+          self.warning('An error has occurred.');
+        });
     },
 
     /**
-     * [clearDataFile description]
+     * [deleteData description]
      * @return {[type]} [description]
      */
-    clearDataFile: function()
+    deleteData: function()
     {
       var self = this;
-      $.get($('#aicc_url').val() + '?command=cleardata&session_id='+this.session_id)
-       .done(function(data){
-        self.success('Data File Cleared');
-       })
-       .fail(function(){
-        self.warning('An error has occurred.');
-       });
+      $.get($('#aicc_url').val() + '?command=cleardata&session_id='+this.sessionId)
+        .done(function(data){
+          self.success('Data deleted for session '+self.sessionId);
+        })
+        .fail(function(){
+          self.warning('An error has occurred.');
+        });
+    },
+
+    /**
+     * [clearSession description]
+     * @return {[type]} [description]
+     */
+    clearSession: function()
+    {
+      var self = this;
+      var sessionId = this.sessionId;
+      $.get($('#aicc_url').val() + '?command=clearsession&session_id='+sessionId)
+        .done(function(data){
+          self.removeSession();
+          self.getPersistedSession();
+          $('#aicc_sid').val(self.sessionId);
+          self.success('Session "'+sessionId+'" cleared');
+          this.getLogs();
+          this.getData();
+        })
+        .fail(function(){
+          self.warning('An error has occurred.');
+        });
     },
 
     /**
@@ -259,10 +304,12 @@ var AiccTestEnvironment = (function($){
      */
     testScript: function()
     {
+      this.persistSession();
+
       var self = this;
-      $.get($('#aicc_url').val() + '?command=test&session_id='+this.session_id)
+      $.get($('#aicc_url').val() + '?command=test&session_id='+this.sessionId)
        .done(function(data){
-        self.refreshLogFile();
+        self.getLogs();
        })
        .fail(function(){
         self.warning('An error has occurred. The AICC test script is not accessible, or an error is causing it to malfunction.');
@@ -293,7 +340,7 @@ var AiccTestEnvironment = (function($){
           if(this.auWin.closed)
           {      
             this.auWin = null;
-            setTimeout(function(){self.refreshLogFile();},1000);
+            setTimeout(function(){self.getLogs();},1000);
           }
           else
           {

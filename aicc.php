@@ -130,6 +130,30 @@ class FileUtils
     return "ERROR";
   }
 
+  /**
+   * [clear_session description]
+   * @return [type] [description]
+   */
+  public function clear_session()
+  {
+    try
+    {
+      if(is_file($this->log_file) && is_writable($this->log_file))
+      {
+        unlink($this->log_file);
+      }
+      if(is_file($this->data_file) && is_writable($this->data_file))
+      {
+        unlink($this->data_file);
+      }
+      return "SUCCESS";
+    }
+    catch (Exception $e)
+    {
+      return "ERROR";
+    }    
+  }
+
 }
 
 /**
@@ -155,7 +179,7 @@ class AICC
 
     $this->now = date("Y-m-d h:ia");
     $this->eol = PHP_EOL;
-    $this->line_sep = "--------------------------------------------{$this->eol}";
+    $this->line_sep = "----------{$this->eol}";
 
     if(isset($_REQUEST["session_id"]))
     {
@@ -353,11 +377,11 @@ class AICC
         break;
 
       case "getlog":
-        echo $this->file_utils->get_log("Logs are empty!");
+        echo $this->file_utils->get_log("No logs exist for '{$this->session_id}'.");
         break;
 
       case "getdata":
-        echo $this->file_utils->get_data("Data file is empty!");
+        echo $this->file_utils->get_data("No data has been persisted for '{$this->session_id}'.");
         break;
 
       case "clearlog":
@@ -368,9 +392,12 @@ class AICC
         echo $this->file_utils->set_data("");
         break;
 
+      case "clearsession":
+        echo $this->file_utils->clear_session();
+        break;
+
       case "test":
-        $s = $this->line_sep;
-        $s .= "AICC Logging Test: ".date(DATE_RFC822).$this->eol;
+        $s .= "AICC Communication Test: ".date(DATE_RFC822).$this->eol;
         $s .= $this->line_sep;
         echo $this->file_utils->log($s);
         break;
