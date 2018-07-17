@@ -86,7 +86,6 @@ ElseIf LCase(Request.Form("command")) = "putparam" Or LCase(Request.Form("comman
     s = ""
     s = s&"error=0" & vbCrLf
     s = s&"version=2.0" & vbCrLf
-    s = s&"aicc_data=" & vbCrLf
     
   End If
   

@@ -347,11 +347,6 @@ class AICC
       case "putperformance":
       case "exitau":
         $s = $this->get_logging_header();
-
-        if(isset($_POST["aicc_data"]))
-        {
-          $this->file_utils->set_data($_POST["aicc_data"]);
-        }
         
         $this->file_utils->log($s);
 
